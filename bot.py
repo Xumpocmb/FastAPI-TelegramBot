@@ -2,7 +2,7 @@ import uvicorn
 from aiogram import Bot, Dispatcher, types
 from fastapi import FastAPI
 
-from tgbot.config import BOT_TOKEN, NGROK
+from tgbot.config import BOT_TOKEN, NGROK, DOMAIN, DEBUG
 from tgbot.handlers import start_handler
 
 bot = Bot(token=BOT_TOKEN)
@@ -10,7 +10,10 @@ dp = Dispatcher()
 
 app = FastAPI()
 WEBHOOK_PATH = f"/bot/{BOT_TOKEN}"
-WEBHOOK_URL = f"{NGROK}{WEBHOOK_PATH}"
+if DEBUG == "dev":
+    WEBHOOK_URL = f"{NGROK}{WEBHOOK_PATH}"
+else:
+    WEBHOOK_URL = f"{DOMAIN}{WEBHOOK_PATH}"
 
 
 @app.on_event("startup")
