@@ -1,8 +1,8 @@
 import uvicorn
-from fastapi import FastAPI
 from aiogram import Bot, Dispatcher, types
-from tgbot.config import BOT_TOKEN, ADMINS, NGROK
+from fastapi import FastAPI
 
+from tgbot.config import BOT_TOKEN, NGROK
 from tgbot.handlers import start_handler
 
 bot = Bot(token=BOT_TOKEN)
@@ -17,11 +17,12 @@ WEBHOOK_URL = f"{NGROK}{WEBHOOK_PATH}"
 async def on_startup():
     # Register routes
     dp.include_router(start_handler.router)
-
-    webhook_info = await bot.get_webhook_info()
-    if webhook_info.url != WEBHOOK_URL:
-        await bot.delete_webhook()
+    await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(WEBHOOK_URL)
+
+    # webhook_info = await bot.get_webhook_info()
+    # if webhook_info.url != WEBHOOK_URL:
+    #     await bot.delete_webhook(drop_pending_updates=True)
 
 
 @app.on_event("shutdown")
@@ -36,4 +37,4 @@ async def bot_webhook(update: dict):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="http://127.0.0.1", port=8000)
